@@ -1,278 +1,721 @@
-# 🎓 Student Management System — 3-Tier Web Application
+# Design and Deploy a 3-Tier Application Using EC2 Instances
 
-A university assignment project demonstrating a **3-Tier Web Application
-Architecture** using:
+## Project Title
 
-- **Frontend:** Next.js (React)
-- **Backend:** Express.js (Node.js)
-- **Database:** MongoDB Atlas (Cloud)
+3-Tier Student Management Application using Next.js, Express.js, MongoDB, Nginx,
+PM2, and AWS EC2
 
 ---
 
-## 📐 What is 3-Tier Architecture?
+# 📌 Project Overview
 
-A 3-tier architecture separates an application into three independent layers.
-Each tier has a specific responsibility and communicates only with the tier
-directly adjacent to it.
+This project demonstrates a complete 3-tier application deployment on AWS EC2
+instances.
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                  TIER 1: FRONTEND                        │
-│              Next.js (runs on port 3000)                 │
-│   - User Interface (pages, forms, tables)                │
-│   - Sends HTTP requests to the Backend API               │
-└────────────────────────┬────────────────────────────────┘
-                         │  HTTP (fetch API)
-                         ▼
-┌─────────────────────────────────────────────────────────┐
-│                  TIER 2: BACKEND                         │
-│             Express.js (runs on port 5000)               │
-│   - REST API endpoints                                   │
-│   - Business logic & validation                          │
-│   - MVC pattern (models, controllers, routes)            │
-└────────────────────────┬────────────────────────────────┘
-                         │  Mongoose (MongoDB driver)
-                         ▼
-┌─────────────────────────────────────────────────────────┐
-│                  TIER 3: DATABASE                        │
-│               MongoDB Atlas (Cloud)                      │
-│   - Stores student records                               │
-│   - Managed cloud database                               │
-└─────────────────────────────────────────────────────────┘
-```
+The architecture consists of:
 
-### Tier 1 — Frontend (Presentation Layer)
+1. Presentation Layer (Frontend)
+2. Application Layer (Backend API)
+3. Data Layer (Database)
 
-The frontend is built with **Next.js**. It is what the user sees and interacts
-with. It does NOT talk to the database directly — it only communicates with the
-backend through HTTP API calls using the `fetch` API.
+The application allows users to:
 
-### Tier 2 — Backend (Application/Logic Layer)
+- Add students
+- View student list
+- Store data in MongoDB database
 
-The backend is built with **Express.js**. It receives requests from the
-frontend, applies business logic (e.g., validation), and queries the database.
-It follows the **MVC (Model-View-Controller)** pattern.
+Technologies used:
 
-### Tier 3 — Database (Data Layer)
-
-The database is **MongoDB Atlas**, a cloud-hosted NoSQL database. It stores all
-student records. The backend connects to it using **Mongoose**, an ODM (Object
-Data Modeling) library.
+- Next.js
+- Express.js
+- MongoDB
+- Nginx
+- PM2
+- AWS EC2
+- Ubuntu 24.04
 
 ---
 
-## 📁 Folder Structure
+# 🧱 3-Tier Architecture
 
-```
-project-root/
+## 1. Presentation Layer
+
+Purpose:
+
+- User interface
+- Handles frontend rendering
+- Sends API requests to backend
+
+Technology:
+
+- Next.js
+- Nginx
+
+EC2 Instance:
+
+- Web Server
+
+Public Access:
+
+- Port 80
+- Port 443
+
+---
+
+## 2. Application Layer
+
+Purpose:
+
+- Handles business logic
+- Processes API requests
+- Communicates with database layer
+
+Technology:
+
+- Node.js
+- Express.js
+- PM2
+
+EC2 Instance:
+
+- App Server
+
+Port:
+
+- 5000
+
+---
+
+## 3. Data Layer
+
+Purpose:
+
+- Stores application data
+- Provides database services
+
+Technology:
+
+- MongoDB Community Server
+
+EC2 Instance:
+
+- Database Server
+
+Port:
+
+- 27017
+
+---
+
+# 🖥️ EC2 Instance Information
+
+## Web Server (Presentation Layer)
+
+- Public IP: 184.72.201.78
+- Private IP: 10.0.1.89
+- Purpose: Frontend + Nginx
+
+---
+
+## App Server (Application Layer)
+
+- Private IP: 10.0.11.180
+- Purpose: Express.js Backend API
+
+---
+
+## Database Server (Data Layer)
+
+- Private IP: 10.0.1.159
+- Purpose: MongoDB Database
+
+---
+
+# 🔒 Security Group Configuration
+
+## Web Server Security Group
+
+Inbound Rules:
+
+| Port | Protocol | Source    |
+| ---- | -------- | --------- |
+| 22   | TCP      | My IP     |
+| 80   | TCP      | 0.0.0.0/0 |
+| 443  | TCP      | 0.0.0.0/0 |
+
+---
+
+## App Server Security Group
+
+Inbound Rules:
+
+| Port | Protocol | Source        |
+| ---- | -------- | ------------- |
+| 22   | TCP      | Web Server SG |
+| 5000 | TCP      | Web Server SG |
+
+---
+
+## Database Server Security Group
+
+Inbound Rules:
+
+| Port  | Protocol | Source        |
+| ----- | -------- | ------------- |
+| 22    | TCP      | App Server SG |
+| 27017 | TCP      | App Server SG |
+
+---
+
+# 📁 Project Structure
+
+```bash
+project/
 │
-├── frontend/                  # Tier 1 — Next.js Frontend
-│   ├── components/
-│   │   └── Navbar.js          # Shared navigation bar
-│   ├── pages/
-│   │   ├── _app.js            # App wrapper
-│   │   ├── index.js           # Home page
-│   │   ├── add-student.js     # Add student form
-│   │   └── students.js        # Student list page
-│   ├── styles/
-│   │   └── globals.css        # Global CSS styles
-│   ├── .env.example           # Frontend env variables template
-│   ├── next.config.js
-│   └── package.json
+├── frontend/
+│   ├── app/
+│   ├── public/
+│   ├── package.json
+│   └── .env.local
 │
-├── backend/                   # Tier 2 — Express.js Backend
+├── backend/
 │   ├── config/
-│   │   └── db.js              # MongoDB connection setup
 │   ├── controllers/
-│   │   └── studentController.js  # Request handlers (business logic)
 │   ├── models/
-│   │   └── Student.js         # Mongoose schema/model
 │   ├── routes/
-│   │   ├── studentRoutes.js   # Student API routes
-│   │   └── healthRoutes.js    # Health check route
-│   ├── .env.example           # Backend env variables template
-│   ├── server.js              # Entry point
-│   └── package.json
+│   ├── server.js
+│   ├── package.json
+│   └── .env
 │
 └── README.md
 ```
 
 ---
 
-## 🔌 API Endpoints
+# ⚙️ Setup Steps
 
-| Method | Endpoint      | Description              |
-| ------ | ------------- | ------------------------ |
-| GET    | /api/health   | Check if server is alive |
-| GET    | /api/students | Get all students         |
-| POST   | /api/students | Add a new student        |
+# Step 1: Launch EC2 Instances
 
-### POST /api/students — Request Body
+Create minimum 3 EC2 instances:
 
-```json
-{
-  "name": "John Doe",
-  "email": "john@university.edu",
-  "department": "Computer Science"
+1. Web Server
+2. App Server
+3. Database Server
+
+OS:
+
+- Ubuntu 24.04
+
+Instance Type:
+
+- t3.medium
+
+---
+
+# Step 2: Connect to EC2
+
+```bash
+ssh -i Aulad-Key.pem ubuntu@PUBLIC_IP
+```
+
+---
+
+# 🌐 Web Server Setup
+
+## Update System
+
+```bash
+sudo apt update && sudo apt upgrade -y
+```
+
+---
+
+## Install Node.js
+
+```bash
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install nodejs -y
+```
+
+Check:
+
+```bash
+node -v
+npm -v
+```
+
+---
+
+## Install Nginx
+
+```bash
+sudo apt install nginx -y
+```
+
+Start:
+
+```bash
+sudo systemctl enable nginx
+sudo systemctl start nginx
+```
+
+Check:
+
+```bash
+sudo systemctl status nginx
+```
+
+---
+
+## Install PM2
+
+```bash
+sudo npm install -g pm2
+```
+
+---
+
+## Clone Frontend Project
+
+```bash
+git clone YOUR_GITHUB_REPOSITORY_LINK
+```
+
+```bash
+cd project/frontend
+```
+
+---
+
+## Install Frontend Dependencies
+
+```bash
+npm install
+```
+
+---
+
+## Configure Frontend Environment
+
+```bash
+nano .env.local
+```
+
+```env
+NEXT_PUBLIC_API_URL=http://10.0.11.180:5000
+```
+
+---
+
+## Build Frontend
+
+```bash
+npm run build
+```
+
+---
+
+## Run Frontend Using PM2
+
+```bash
+pm2 start npm --name frontend -- start
+```
+
+```bash
+pm2 save
+```
+
+---
+
+## Configure Nginx
+
+```bash
+sudo nano /etc/nginx/sites-available/frontend
+```
+
+Paste:
+
+```nginx
+server {
+    listen 80;
+    server_name 184.72.201.78;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+
+        proxy_cache_bypass $http_upgrade;
+    }
 }
 ```
 
----
-
-## 🗄️ Database Schema
-
-**Collection:** `students`
-
-| Field      | Type   | Required | Notes                        |
-| ---------- | ------ | -------- | ---------------------------- |
-| name       | String | Yes      | Student full name            |
-| email      | String | Yes      | Must be unique               |
-| department | String | Yes      | Student's department         |
-| createdAt  | Date   | Auto     | Added by Mongoose timestamps |
-| updatedAt  | Date   | Auto     | Added by Mongoose timestamps |
-
----
-
-## ⚙️ Setup Instructions
-
-### Prerequisites
-
-Make sure you have the following installed:
-
-- [Node.js](https://nodejs.org/) (v18 or higher)
-- [npm](https://www.npmjs.com/)
-- A [MongoDB Atlas](https://www.mongodb.com/atlas) account (free tier works)
-
----
-
-### Step 1 — Get Your MongoDB Atlas Connection String
-
-1. Go to [MongoDB Atlas](https://www.mongodb.com/atlas) and sign up / log in
-2. Create a free cluster
-3. Click **Connect** → **Drivers** → Copy the connection string
-4. It looks like: `mongodb+srv://<user>:<password>@cluster0.xxxxx.mongodb.net/`
-
----
-
-### Step 2 — Setup the Backend
+Enable configuration:
 
 ```bash
-# Navigate to the backend folder
-cd backend
+sudo ln -s /etc/nginx/sites-available/frontend /etc/nginx/sites-enabled/
+```
 
-# Install dependencies
+Test:
+
+```bash
+sudo nginx -t
+```
+
+Restart:
+
+```bash
+sudo systemctl restart nginx
+```
+
+---
+
+# ⚙️ Application Layer Setup
+
+## Connect to App Server
+
+```bash
+ssh -i Aulad-Key.pem ubuntu@10.0.11.180
+```
+
+---
+
+## Install Node.js
+
+```bash
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install nodejs -y
+```
+
+---
+
+## Install PM2
+
+```bash
+sudo npm install -g pm2
+```
+
+---
+
+## Clone Backend Project
+
+```bash
+git clone YOUR_GITHUB_REPOSITORY_LINK
+```
+
+```bash
+cd project/backend
+```
+
+---
+
+## Install Dependencies
+
+```bash
 npm install
-
-# Create your .env file from the example
-cp .env.example .env
 ```
 
-Edit `backend/.env` and fill in your values:
+---
 
+## Configure Backend Environment
+
+```bash
+nano .env
 ```
-MONGO_URI=mongodb+srv://youruser:yourpassword@cluster0.xxxxx.mongodb.net/studentdb?retryWrites=true&w=majority
+
+```env
 PORT=5000
+MONGO_URI=mongodb://10.0.1.159:27017/devops
+DB_NAME=devops
+COLLECTION_NAME=data
 ```
 
 ---
 
-### Step 3 — Setup the Frontend
+## Start Backend
 
 ```bash
-# Navigate to the frontend folder
-cd frontend
-
-# Install dependencies
-npm install
-
-# Create your .env file from the example
-cp .env.example .env.local
+npm start
 ```
 
-The default `frontend/.env.local` content:
+OR
 
+```bash
+node server.js
 ```
-NEXT_PUBLIC_API_URL=http://localhost:5000
+
+Expected:
+
+```text
+MongoDB Connected
+Server running on port 5000
 ```
 
 ---
 
-### Step 4 — Run the Application
-
-Open **two terminal windows**:
-
-**Terminal 1 — Start the Backend:**
+## Run Backend Using PM2
 
 ```bash
-cd backend
-npm run dev
+pm2 start server.js --name backend
 ```
 
-You should see:
-
-```
-✅ MongoDB Connected: cluster0.xxxxx.mongodb.net
-✅ Backend server running on http://localhost:5000
-```
-
-**Terminal 2 — Start the Frontend:**
+Check:
 
 ```bash
-cd frontend
-npm run dev
+pm2 status
 ```
 
-You should see:
+Logs:
 
-```
-▲ Next.js ready on http://localhost:3000
+```bash
+pm2 logs backend
 ```
 
 ---
 
-### Step 5 — Open the App
-
-Visit **http://localhost:3000** in your browser.
-
----
-
-## 🧪 Test the API (Optional)
-
-You can test the backend directly using curl or a tool like Postman:
+## API Testing
 
 ```bash
-# Health check
 curl http://localhost:5000/api/health
+```
 
-# Get all students
+```bash
 curl http://localhost:5000/api/students
-
-# Add a student
-curl -X POST http://localhost:5000/api/students \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Alice","email":"alice@uni.edu","department":"Computer Science"}'
 ```
 
 ---
 
-## 🛠️ Tech Stack Summary
+# 🗄️ Database Layer Setup
 
-| Layer    | Technology    | Purpose                        |
-| -------- | ------------- | ------------------------------ |
-| Frontend | Next.js 14    | UI, routing, fetch API calls   |
-| Backend  | Express.js 4  | REST API, business logic       |
-| Database | MongoDB Atlas | Cloud NoSQL data storage       |
-| ODM      | Mongoose 8    | Schema definition & DB queries |
-| Env Vars | dotenv        | Secure configuration           |
-| CORS     | cors package  | Cross-origin request handling  |
+## Connect to Database Server
+
+```bash
+ssh -i Aulad-Key.pem ubuntu@10.0.1.159
+```
 
 ---
 
-## 📝 Notes
+## Install MongoDB
 
-- The frontend and backend run on **separate ports** (3000 and 5000). CORS is
-  enabled on the backend to allow this.
-- Environment variables starting with `NEXT_PUBLIC_` are exposed to the browser
-  in Next.js.
-- Never commit your `.env` files to version control. They are listed in
-  `.gitignore`.
+```bash
+sudo apt install -y gnupg curl
+```
+
+```bash
+curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | \
+sudo gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg --dearmor
+```
+
+```bash
+echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu noble/mongodb-org/8.0 multiverse" | \
+sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
+```
+
+```bash
+sudo apt update
+```
+
+```bash
+sudo apt install -y mongodb-org
+```
+
+---
+
+## Start MongoDB
+
+```bash
+sudo systemctl start mongod
+```
+
+```bash
+sudo systemctl enable mongod
+```
+
+Check:
+
+```bash
+sudo systemctl status mongod
+```
+
+---
+
+## Configure MongoDB Network
+
+```bash
+sudo nano /etc/mongod.conf
+```
+
+```yaml
+net:
+  port: 27017
+  bindIp: 127.0.0.1,10.0.1.159
+```
+
+Restart:
+
+```bash
+sudo systemctl restart mongod
+```
+
+---
+
+## Test MongoDB
+
+```bash
+mongosh
+```
+
+```js
+use devops
+```
+
+```js
+db.data.insertOne({
+  name: 'Test Student',
+  email: 'test@gmail.com',
+  department: 'CSE',
+});
+```
+
+```js
+db.data.find();
+```
+
+---
+
+# 🔗 Connectivity Between Layers
+
+## Web Server → App Server
+
+```bash
+curl http://10.0.11.180:5000/api/health
+```
+
+Expected:
+
+```json
+{ "status": "ok" }
+```
+
+---
+
+## App Server → Database Server
+
+Expected Backend Logs:
+
+```text
+MongoDB Connected
+```
+
+---
+
+# 🌍 Application Access Result
+
+## Frontend URL
+
+```text
+http://184.72.201.78
+```
+
+---
+
+## Backend API
+
+```text
+http://10.0.11.180:5000/api/health
+```
+
+---
+
+# 📊 PM2 Commands
+
+## Status
+
+```bash
+pm2 status
+```
+
+## Logs
+
+```bash
+pm2 logs
+```
+
+## Restart
+
+```bash
+pm2 restart all
+```
+
+## Stop
+
+```bash
+pm2 stop all
+```
+
+---
+
+# 📸 Screenshots (Proof of Work)
+
+Include screenshots of:
+
+1. AWS EC2 Instances
+2. Security Groups
+3. Nginx Running
+4. PM2 Status
+5. MongoDB Running
+6. Frontend Running in Browser
+7. API Test Result
+8. MongoDB Data Inserted
+9. MongoDB Data Retrieved
+10. Web Server → App Server Connectivity
+11. App Server → Database Server Connectivity
+
+---
+
+# 📈 Marking Scheme Coverage
+
+| Criteria                             | Status    |
+| ------------------------------------ | --------- |
+| Architecture Setup                   | Completed |
+| Nginx Configuration                  | Completed |
+| Backend Application                  | Completed |
+| Database Setup                       | Completed |
+| Connectivity Between Layers          | Completed |
+| Documentation (README + Screenshots) | Completed |
+
+---
+
+# 🚀 Final Result
+
+Successfully designed and deployed a complete 3-tier application using:
+
+- AWS EC2
+- Next.js
+- Express.js
+- MongoDB
+- Nginx
+- PM2
+
+The project maintains proper separation between:
+
+- Presentation Layer
+- Application Layer
+- Data Layer
+
+and satisfies all assignment constraints.
+
+---
+
+# 🔗 Git Repository Link
+
+GITHUB_REPOSITORY_LINK:https://github.com/auladwd/3-tier-application
+
+![Photo-1](./Screenshots/Image-1.jpg)
+
+![Photo-2](./Screenshots/Image-2.jpg)
+
+![Photo-2](./Screenshots/Image-3.jpg)
