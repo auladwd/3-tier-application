@@ -7,7 +7,7 @@ PM2, and AWS EC2
 
 ---
 
-# 📌 Project Overview
+# Project Overview
 
 This project demonstrates a complete 3-tier application deployment on AWS EC2
 instances.
@@ -36,7 +36,7 @@ Technologies used:
 
 ---
 
-# 🧱 3-Tier Architecture
+# 3-Tier Architecture
 
 ## 1. Presentation Layer
 
@@ -107,7 +107,7 @@ Port:
 
 ---
 
-# 🖥️ EC2 Instance Information
+# EC2 Instance Information
 
 ## Web Server (Presentation Layer)
 
@@ -131,7 +131,7 @@ Port:
 
 ---
 
-# 🔒 Security Group Configuration
+# Security Group Configuration
 
 ## Web Server Security Group
 
@@ -167,7 +167,7 @@ Inbound Rules:
 
 ---
 
-# 📁 Project Structure
+# Project Structure
 
 ```bash
 project/
@@ -192,7 +192,7 @@ project/
 
 ---
 
-# ⚙️ Setup Steps
+# Setup Steps
 
 # Step 1: Launch EC2 Instances
 
@@ -220,7 +220,7 @@ ssh -i Aulad-Key.pem ubuntu@PUBLIC_IP
 
 ---
 
-# 🌐 Web Server Setup
+# Web Server Setup
 
 ## Update System
 
@@ -373,7 +373,7 @@ sudo systemctl restart nginx
 
 ---
 
-# ⚙️ Application Layer Setup
+# Application Layer Setup
 
 ## Connect to App Server
 
@@ -488,7 +488,7 @@ curl http://localhost:5000/api/students
 
 ---
 
-# 🗄️ Database Layer Setup
+# Database Layer Setup
 
 ## Connect to Database Server
 
@@ -586,7 +586,7 @@ db.data.find();
 
 ---
 
-# 🔗 Connectivity Between Layers
+# Connectivity Between Layers
 
 ## Web Server → App Server
 
@@ -612,7 +612,7 @@ MongoDB Connected
 
 ---
 
-# 🌍 Application Access Result
+# Application Access Result
 
 ## Frontend URL
 
@@ -630,7 +630,7 @@ http://10.0.11.180:5000/api/health
 
 ---
 
-# 📊 PM2 Commands
+# PM2 Commands
 
 ## Status
 
@@ -658,7 +658,7 @@ pm2 stop all
 
 ---
 
-# 📸 Screenshots (Proof of Work)
+# Screenshots (Proof of Work)
 
 Include screenshots of:
 
@@ -676,7 +676,7 @@ Include screenshots of:
 
 ---
 
-# 📈 Marking Scheme Coverage
+# Marking Scheme Coverage
 
 | Criteria                             | Status    |
 | ------------------------------------ | --------- |
@@ -689,7 +689,7 @@ Include screenshots of:
 
 ---
 
-# 🚀 Final Result
+# Final Result
 
 Successfully designed and deployed a complete 3-tier application using:
 
