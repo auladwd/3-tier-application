@@ -718,4 +718,4 @@ GITHUB_REPOSITORY_LINK:https://github.com/auladwd/3-tier-application
 
 ![Photo-2](./Screenshots/Image-2.jpg)
 
-![Photo-2](./Screenshots/Image-3.jpg)
+![Photo-2](./Screenshots/Image.jpg)
